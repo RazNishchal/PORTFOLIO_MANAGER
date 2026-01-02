@@ -62,7 +62,7 @@ const Login = ({ toggleToRegister }) => {
 
     return (
         <AuthTheme
-            title="Login For Free!"
+            title="Login  For  Free!"
             subtitle="Enter your details to manage your portfolio"
             status={status}
             onBackToLogin={() => {
@@ -87,7 +87,7 @@ const Login = ({ toggleToRegister }) => {
                     <div className="password-input-wrapper" style={{ position: 'relative' }}>
                         <input
                             type={showPassword ? "text" : "password"}
-                            placeholder="********"
+                            placeholder="••••••••"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                             required
