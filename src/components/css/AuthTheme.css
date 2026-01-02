@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+/* --- MASTER WRAPPER --- */
+.auth-page-wrapper {
+    min-height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; 
+    position: fixed; 
+    top: 0;
+    left: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 🌑 PREMIUM DARK MODE */
+.auth-dark-mode {
+    background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, rgb(56, 87, 181) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+    background-color: #1e2433; /* Darker base for better contrast */
+}
+
+.auth-dark-mode .auth-card {
+    background: rgba(30, 36, 51, 0.6);
+    backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* ✨ Fix: Label Color set to WHITE for Dark Mode */
+.auth-dark-mode label {
+    color: #ffffff !important; /* Set to white as requested */
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+}
+
+.auth-dark-mode h1 {
+    background: linear-gradient(to bottom right, #fff, #b8c1ce);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-dark-mode p { color: #b3bdca; }
+
+.auth-dark-mode input {
+    background: rgba(15, 22, 54, 0.5) !important;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    color: #f8fafc !important;
+}
+
+/* ☀️ PREMIUM LIGHT MODE */
+.auth-light-mode {
+    background: #f8fafc;
+    background-image: 
+        radial-gradient(at 99% 6%, hsla(210,100%,95%,1) 0, transparent 50%), 
+        radial-gradient(at 4% 96%, hsla(210,100%,98%,1) 0, transparent 50%);
+}
+
+.auth-light-mode .auth-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+/* ✨ Fix: Label Color set to DARK for Light Mode */
+.auth-light-mode label {
+    color: #0f172a !important; /* Set to dark slate for readability */
+    font-weight: 700;
+}
+
+.auth-light-mode h1 { color: #0f172a; }
+.auth-light-mode p { color: #64748b; }
+
+.auth-light-mode input {
+    background: rgba(241, 245, 249, 0.7) !important;
+    border: 1px solid #e2e8f0;
+    color: #0f172a !important;
+}
+
+/* --- SHARED STYLES --- */
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 3rem;
+    border-radius: 32px;
+    animation: authReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px; /* Increased spacing */
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+input {
+    width: 100%;
+    height: 52px;
+    padding: 0 1.25rem;
+    margin-bottom: 1.25rem;
+    border-radius: 16px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+}
+
+.status-msg {
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.status-msg.error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+.status-msg.success { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+
+@keyframes authReveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,232 @@
+/* --- BASE CONTAINER --- */
+.settings-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Occupy full viewport height to push footer to the absolute bottom */
+  min-height: 85vh; 
+  width: 100%;
+  padding-bottom: 2rem;
+  transition: background 0.3s ease;
+  position: relative;
+}
+
+/* --- THE WRAPPER CARD --- */
+.settings-wrapper {
+  width: 90%;
+  max-width: 380px; 
+  margin: 1.5rem auto 0 auto;
+  background: #ffffff;
+  padding: 1.2rem 1.8rem;
+  border-radius: 1.2rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+}
+
+/* 🌙 Dark Mode Wrapper */
+.dark-mode .settings-wrapper {
+  background: #1e293b; /* Deep Slate */
+  border: 1px solid #334155;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+@media (min-width: 1024px) {
+  .settings-wrapper {
+    max-width: 550px; 
+    padding: 2.5rem 3.5rem;
+  }
+}
+
+/* --- TEXT & HEADERS --- */
+.auth-header h1 { 
+  font-size: 1.2rem;
+  color: #1e293b; 
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* 🌙 Dark Mode Header */
+.dark-mode .auth-header h1 {
+  color: #f1f5f9;
+}
+
+.settings-form { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.7rem; 
+}
+
+/* Labels */
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 4px;
+  display: block;
+}
+
+/* 🌙 Dark Mode Labels */
+.dark-mode .stat-label {
+  color: #94a3b8;
+}
+
+/* --- INPUT FIELDS --- */
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input { 
+  width: 100%; 
+  padding: 10px 40px 10px 12px; 
+  border-radius: 6px; 
+  border: 1px solid #e2e8f0; 
+  font-size: 0.9rem;
+  background: #f8fafc;
+  color: #1e293b;
+  transition: all 0.2s ease;
+}
+
+/* 🌙 Dark Mode Input */
+.dark-mode .password-input-wrapper input {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #f8fafc;
+}
+
+.password-input-wrapper input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.toggle-view {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.6;
+  color: inherit;
+}
+
+/* --- RESPONSIVE PREMIUM BUTTON --- */
+.btn-auth {
+  margin-top: 1rem;
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  color: white;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+/* Mobile Settings Button */
+@media (max-width: 1023px) {
+  .btn-auth {
+    height: 48px;
+    width: 95%; 
+    align-self: center;
+    border-radius: 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Desktop Settings Button */
+@media (min-width: 1024px) {
+  .btn-auth {
+    height: 42px;
+    width: 220px; 
+    align-self: center;
+    border-radius: 8px;
+    font-size: 0.85rem;
+  }
+  .btn-auth:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.45);
+  }
+}
+
+.btn-auth:active { transform: scale(0.96); }
+.btn-auth:disabled { background: #94a3b8; cursor: not-allowed; opacity: 0.8; }
+
+/* --- ⚡ FOOTER STATUS (LAST & MIDDLE) ⚡ --- */
+.status-container-outside {
+  /* Pushes this div to the absolute bottom of the container */
+  margin-top: auto; 
+  width: 100%;
+  padding-top: 2.5rem;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  height: 40px;
+}
+
+.status-pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border-width: 1px;
+  border-style: solid;
+}
+
+/* Status Pill Colors - Light Mode */
+.status-pill.success { 
+  background-color: #ecfdf5; 
+  color: #059669; 
+  border-color: #10b981; 
+}
+.status-pill.error { 
+  background-color: #fef2f2; 
+  color: #dc2626; 
+  border-color: #f87171; 
+}
+
+/* 🌙 Status Pill Colors - Dark Mode */
+.dark-mode .status-pill.success {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: #059669;
+}
+.dark-mode .status-pill.error {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: #dc2626;
+}
+
+
+.settings-light-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f8fafc; /* Light gray background */
+    padding: 20px;
+}
+
+.settings-card-light {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    width: 100%;
+    max-width: 450px;
+    color: #1e293b;
+}
+
+.settings-card-light h2 { margin-bottom: 0.5rem; }
+.settings-card-light p { color: #64748b; margin-bottom: 2rem; font-size: 0.9rem; }

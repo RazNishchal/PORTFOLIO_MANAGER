@@ -1,0 +1,287 @@
+/* auth.css - High-End SaaS Design System */
+
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --bg-dark: #0f172a;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --card-bg: #ffffff;
+  --input-bg: #f8fafc;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-wrapper {
+  background: #f8fafc;
+  /* Subtle mesh background for premium feel */
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.05) 0px, transparent 50%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Fixed height with auto-scaling for various screen heights */
+.auth-wrapper .auth-card, 
+.auth-wrapper .form-slide-in {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 440px;
+  /* Balanced height: fits 2 or 3 inputs perfectly without extra space */
+  min-height: 580px; 
+  padding: 3rem 2.5rem;
+  border-radius: 2rem;
+  box-shadow: var(--shadow-premium);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header Typography */
+.auth-header {
+  text-align: center;
+}
+
+.auth-header h1 {
+  color: var(--bg-dark);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em; /* Premium typography */
+  margin-bottom: 0.75rem;
+}
+
+.auth-header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Form Layout & Inputs */
+.auth-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; 
+  margin: 2rem 0;
+}
+
+/* Slightly tighter gaps for the Register form to maintain the same card height */
+.register-form .auth-form-body {
+  gap: 1.1rem;
+  margin: 1.5rem 0;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-field label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #FFFF00;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.input-field input {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: 1rem;
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  transition: all 0.25s ease;
+}
+
+.input-field input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Forgot/Resend Links Container */
+.forgot-link-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -0.5rem;
+}
+
+.link-btn-small {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.link-btn-small:hover {
+  color: var(--primary-hover);
+}
+
+/* Action Buttons */
+.btn-auth {
+  width: 100%;
+  background: var(--bg-dark);
+  color: #ffffff;
+  padding: 1.1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  margin-top: 1rem;
+}
+
+.btn-auth:hover {
+  background: #000000;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+}
+
+.btn-auth:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.register-form .btn-auth {
+  background: var(--primary);
+}
+
+.register-form .btn-auth:hover {
+  background: var(--primary-hover);
+}
+
+/* Footer Section */
+.auth-footer {
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+}
+
+.auth-footer p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.link-btn {
+  color: var(--primary);
+  font-weight: 800;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Status Messages (Non-disruptive) */
+/* --- Optimized Status Messages (No Layout Shift) --- */
+
+/* --- Compact & Cute Pill Notification --- */
+
+.status-msg {
+  position: absolute;
+  top: 1.25rem;       /* Slightly closer to the top edge */
+  left: 50%;          /* Move to middle */
+  transform: translateX(-50%); /* Perfect horizontal center */
+  z-index: 20;
+  
+  width: max-content;  /* Only as wide as the text */
+  max-width: 80%;      /* Prevents it from hitting edges on mobile */
+  padding: 0.5rem 1.25rem; /* Slimmer vertical, wider horizontal */
+  border-radius: 2rem; /* Fully rounded "pill" shape */
+  
+  font-size: 0.75rem;  /* Smaller, cuter text */
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap; /* Keeps text on one line */
+  
+  /* Glassmorphism & High-end shadow */
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid transparent;
+  
+  /* Smooth "Pop" animation */
+  animation: toastPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes toastPop {
+  from { 
+    opacity: 0; 
+    transform: translateX(-50%) translateY(-20px) scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0) scale(1); 
+  }
+}
+
+.status-msg.error { 
+  background: rgba(255, 241, 242, 0.98); 
+  color: #e11d48; 
+  border-color: rgba(251, 113, 133, 0.3); 
+}
+
+.status-msg.success { 
+  background: rgba(240, 253, 244, 0.98); 
+  color: #16a34a; 
+  border-color: rgba(74, 222, 128, 0.3); 
+}
+
+
+.input-field_resend{
+  gap: 10px;
+}
+
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Ensure the card has relative positioning to contain the absolute message */
+.auth-wrapper .auth-card, 
+.auth-wrapper .form-slide-in {
+  position: relative; /* CRITICAL: keeps notification inside the box */
+  /* ... rest of your existing card styles ... */
+}
+/* Responsive Viewports */
+@media (max-width: 640px) {
+  .auth-wrapper .auth-card, 
+  .auth-wrapper .form-slide-in {
+    padding: 2.5rem 1.75rem;
+    height: auto; /* Allow flexibility on mobile */
+    min-height: 520px;
+    border-radius: 1.5rem;
+  }
+  
+  .auth-header h1 { font-size: 1.6rem; }
+}
+
+@media (max-height: 700px) {
+  .auth-wrapper .auth-card, 
+  .auth-wrapper .form-slide-in {
+    height: auto;
+    padding: 2rem;
+  }
+}

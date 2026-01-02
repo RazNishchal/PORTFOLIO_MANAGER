@@ -1,0 +1,305 @@
+/* --- BOX MODEL & THEME SYNC --- */
+.transaction-card,
+.transaction-card *,
+.transaction-card *::before,
+.transaction-card *::after {
+  box-sizing: border-box;
+}
+
+.transaction-card {
+  /* Pulls from global App.css variables */
+  background-color: var(--bg-card); 
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  box-shadow: var(--shadow);
+  max-width: 100%;
+  position: relative;
+  overflow: visible;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.transaction-card h3 {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 1.75rem;
+  letter-spacing: -0.025em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  position: relative;
+  width: 100%;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary); /* Adapts to theme */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --- THEMED INPUTS --- */
+.input-field {
+  background-color: var(--bg-input); /* Slate-50 in Light, Deep Grey in Dark */
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%; 
+  outline: none;
+}
+
+.input-field:focus {
+  background-color: var(--bg-card);
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* --- SEARCH DROPDOWN THEMING --- */
+/* ... [Previous card and input styles remain the same] ... */
+
+/* --- SEARCH DROPDOWN THEMING --- */
+.search-wrapper {
+  position: relative;
+}
+
+.custom-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background-color: var(--bg-card); /* Flips to dark slate in dark mode */
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 0.5rem;
+  box-shadow: var(--shadow);
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+.custom-dropdown li {
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  border-radius: 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+  transition: all 0.2s ease;
+  
+}
+
+/* Hover highlight adapts to theme grey */
+.custom-dropdown li:hover {
+  background-color: var(--bg-input); 
+  transform: translateX(4px);
+}
+
+/* --- DROPDOWN TEXT COLORS (The fix for vanishing letters) --- */
+
+.drop-sym {
+  font-weight: 800;
+  color: var(--text-primary); /* Automatically white in dark mode */
+  font-size: 0.95rem;
+}
+
+.drop-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary); /* Automatically light grey in dark mode */
+}
+
+
+
+
+
+/* Error Banner Styling */
+.error-banner {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fee2e2;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: center;
+    animation: shake 0.4s ease-in-out, fadeIn 0.3s ease-in;
+}
+
+/* Shake animation for the error */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Ensure the submit button transition feels smooth */
+.btn-submit {
+    transition: background-color 0.3s ease, transform 0.1s active;
+    color: white;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
+    width: 100%;
+}
+
+
+
+
+
+.drop-sector {
+  font-size: 0.65rem;
+  color: var(--text-secondary); /* Automatically light grey in dark mode */
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.drop-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: #10b981; 
+  font-size: 0.9rem;
+  background: rgba(16, 185, 129, 0.15); /* Slightly brighter for dark mode visibility */
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* Force children to maintain theme color on hover */
+.custom-dropdown li:hover .drop-sym {
+  color: var(--text-primary);
+}
+
+.custom-dropdown li:hover .drop-name,
+.custom-dropdown li:hover .drop-sector {
+  color: var(--text-primary); /* Text brightens slightly on hover */
+}
+
+/* ... [Remaining button styles remain the same] ... */
+
+/* --- BUTTON & LAYOUT --- */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* --- BUTTON & LAYOUT --- */
+.btn-submit {
+  width: 100%;
+  display: block;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 5rem;
+  transition: all 0.2s ease; /* Smooth return to normal */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-submit:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.15);
+}
+
+/* --- THE CLICK FADE EFFECT --- */
+.btn-submit:active {
+  /* Fades the color slightly on click */
+  opacity: 0.75; 
+  /* Makes the button look like it's being pushed into the screen */
+  transform: translateY(0) scale(0.97); 
+  /* Removes transition for instant response to finger/mouse click */
+  transition: none; 
+}
+
+/* Scrollbar theme */
+.custom-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 10px;
+}
+
+/* Container for header and floating error */
+.form-header-row {
+    position: relative; /* Essential for absolute positioning of children */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+
+.form-title {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+/* Floating message: Occupies no layout space */
+.floating-error-msg {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fee2e2;
+    color: #ef4444;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    z-index: 20;
+    animation: slideIn 0.3s ease-out;
+    pointer-events: none;
+}
+
+/* Red glow for the unit input when error is active */
+.input-error-glow {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-50%) translateX(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(-50%) translateX(0); 
+    }
+}
