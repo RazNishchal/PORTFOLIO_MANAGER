@@ -88,7 +88,7 @@ const Register = ({ onRegistrationSuccess }) => {
     };
 
     return (
-        <AuthTheme title="Register For Free!" status={status} onBackToLogin={() => navigate('/login')}>
+        <AuthTheme title="Register  For  Free!" status={status} onBackToLogin={() => navigate('/login')}>
             <form onSubmit={handleRegister} className="auth-form-body">
                 <div className="input-field">
                     <label>Email Address</label>
