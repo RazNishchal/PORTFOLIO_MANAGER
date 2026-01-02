@@ -36,7 +36,7 @@
 .auth-dark-mode label {
     color: #ffffff !important; /* Set to white as requested */
     font-weight: 600;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.025em;
     opacity: 0.9;
 }
 
@@ -46,7 +46,10 @@
     -webkit-text-fill-color: transparent;
 }
 
-.auth-dark-mode p { color: #b3bdca; }
+
+.auth-light-mode p { color: #c3cbd5;;
+font-size: 0.9rem; text-align:center; }
+
 
 .auth-dark-mode input {
     background: rgba(15, 22, 54, 0.5) !important;
@@ -72,11 +75,14 @@
 /* ✨ Fix: Label Color set to DARK for Light Mode */
 .auth-light-mode label {
     color: #0f172a !important; /* Set to dark slate for readability */
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .auth-light-mode h1 { color: #0f172a; }
-.auth-light-mode p { color: #64748b; }
+.auth-light-mode p { color: #64748b;
+font-size: 0.9rem; text-align:center; }
+
+
 
 .auth-light-mode input {
     background: rgba(241, 245, 249, 0.7) !important;
@@ -96,7 +102,7 @@
 label {
     display: block;
     margin-bottom: 8px; /* Increased spacing */
-    font-size: 0.9rem;
+    font-size: 1rem;
     transition: color 0.3s ease;
 }
 
@@ -111,6 +117,7 @@ input {
     transition: all 0.2s ease;
 }
 
+
 input:focus {
     border-color: #38bdf8 !important;
     box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
@@ -120,7 +127,7 @@ input:focus {
     padding: 1rem;
     border-radius: 12px;
     margin-bottom: 1.5rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-align: center;
 }

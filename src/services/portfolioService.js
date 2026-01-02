@@ -23,17 +23,13 @@ export const listenToPortfolio = (userId, callback) => {
 };
 
 /**
- * 👤 GET USER INFO (Used for Verification Checks)
- * Fetches the specific userInfo node for a user
+ * 👤 GET USER INFO
  */
 export const getUserInfoFromDB = async (userId) => {
     try {
         const userInfoRef = ref(db, `users/${userId}/userInfo`);
         const snapshot = await get(userInfoRef);
-        if (snapshot.exists()) {
-            return snapshot.val();
-        }
-        return null;
+        return snapshot.exists() ? snapshot.val() : null;
     } catch (error) {
         console.error("Error fetching user info:", error);
         throw error;
@@ -41,18 +37,28 @@ export const getUserInfoFromDB = async (userId) => {
 };
 
 /**
- * 👤 UPDATE USER INFO (Email & Password History)
+ * 👤 UPDATE USER INFO (Email, Verification, and Metadata)
+ * This is the central function for pushing user changes to the DB.
  */
 export const updateUserInfoInDB = async (userId, data) => {
-    const userInfoRef = ref(db, `users/${userId}/userInfo`);
-    await update(userInfoRef, {
-        ...data,
-        lastModified: new Date().toISOString()
-    });
+    if (!userId) return;
+    try {
+        const userInfoRef = ref(db, `users/${userId}/userInfo`);
+
+        // We use update to merge new data into the existing userInfo node
+        await update(userInfoRef, {
+            ...data,
+            lastModified: new Date().toISOString(),
+            // Ensure server-side tracking if not provided
+            serverTimestamp: Date.now()
+        });
+    } catch (error) {
+        console.error("Error updating user info in DB:", error);
+    }
 };
 
 /**
- * 🚀 UPDATE PORTFOLIO (User-node only)
+ * 🚀 UPDATE PORTFOLIO
  */
 export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, marketData = {}) => {
     const symbol = tx.symbol.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
@@ -76,9 +82,9 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
     }
 
     const updates = {};
-    const holdingPath = `users/${userId}/holdings/${symbol}`;
 
-    // Update holdings: remove if units are 0
+    // 1. Update Holdings
+    const holdingPath = `users/${userId}/holdings/${symbol}`;
     updates[holdingPath] = newUnits <= 0 ? null : {
         symbol,
         companyName,
@@ -87,7 +93,7 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
         lastUpdated: new Date().toISOString()
     };
 
-    // Add transaction history
+    // 2. Add Transaction History
     const newTxKey = push(ref(db, `users/${userId}/transactions`)).key;
     updates[`users/${userId}/transactions/${newTxKey}`] = {
         symbol,
@@ -98,12 +104,15 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
         timestamp: Date.now()
     };
 
+    // 3. Update User Metadata (Sync on every transaction)
+    updates[`users/${userId}/userInfo/lastTransactionAt`] = new Date().toISOString();
+
     await update(ref(db), updates);
     return pruneTransactions(userId);
 };
 
 /**
- * 🧹 PRUNE TRANSACTIONS (Keeps DB clean)
+ * 🧹 PRUNE TRANSACTIONS
  */
 const pruneTransactions = async (userId) => {
     const txRef = ref(db, `users/${userId}/transactions`);
@@ -115,7 +124,6 @@ const pruneTransactions = async (userId) => {
         allTx.push({ key: child.key, ...child.val() });
     });
 
-    // Sort by newest first
     allTx.sort((a, b) => b.timestamp - a.timestamp);
 
     const cleanupUpdates = {};
@@ -124,7 +132,6 @@ const pruneTransactions = async (userId) => {
 
     allTx.forEach((tx) => {
         countMap[tx.symbol] = (countMap[tx.symbol] || 0) + 1;
-        // Keep only top 20 total transactions, and max 2 per specific symbol
         if (kept.length < 20 && (countMap[tx.symbol] || 0) <= 2) {
             kept.push(tx.key);
         } else {
@@ -135,4 +142,4 @@ const pruneTransactions = async (userId) => {
     if (Object.keys(cleanupUpdates).length > 0) {
         return update(ref(db), cleanupUpdates);
     }
-}; 
+};

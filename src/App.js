@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from './context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -16,7 +15,6 @@ import Settings from './components/Auth/Settings';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Verify from './components/Auth/Verify';
-import NewLogin from './components/Auth/NewLogin';
 
 // Portfolio Components
 import DashboardHeader from './components/Portfolio/DashboardHeader';
@@ -29,7 +27,7 @@ import PortfolioChart from './components/Portfolio/PortfolioChart';
 import './App.css';
 
 function App() {
-  const { user, loading: authLoading, refreshUser } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,7 +39,7 @@ function App() {
     return localStorage.getItem('theme') === 'dark';
   });
 
-  // 1️⃣ ROUTE PROTECTION & REDIRECTS (login, register, new-login, dashboard, settings)
+  // 1️⃣ ROUTE PROTECTION & REDIRECTS
   useEffect(() => {
     if (authLoading) return;
 
@@ -49,16 +47,14 @@ function App() {
 
     // A. If user is authenticated and verified
     if (user?.emailVerified && !isAuthProcessing) {
-      // If user lands on Auth pages or root, push to dashboard
-      const authRoutes = ['/login', '/register', '/new-login', '/'];
+      const authRoutes = ['/login', '/register', '/'];
       if (authRoutes.includes(path)) {
         navigate('/dashboard');
       }
     }
     // B. If user is NOT authenticated/verified
     else {
-      // Only allow these 3 specific public paths
-      const allowedPaths = ['/login', '/register', '/new-login'];
+      const allowedPaths = ['/login', '/register'];
       if (!allowedPaths.includes(path)) {
         navigate('/login');
       }
@@ -125,7 +121,7 @@ function App() {
 
   /**
    * 🚧 AUTH GATE
-   * Strictly handles: login, register, new-login
+   * Strictly handles: login, register
    */
   const accessDenied = !user || !user.emailVerified || isAuthProcessing;
 
@@ -135,19 +131,8 @@ function App() {
         <Register
           toggleToLogin={() => navigate('/login')}
           setIsAuthProcessing={setIsAuthProcessing}
-          onRegistrationSuccess={() => navigate('/new-login')}
-        />
-      );
-    }
-
-    if (location.pathname === '/new-login') {
-      return (
-        <NewLogin
-          onBackToLogin={() => navigate('/login')}
-          onComplete={async () => {
-            await refreshUser();
-            navigate('/dashboard');
-          }}
+          // On registration success, we now go to login to wait for verification
+          onRegistrationSuccess={() => navigate('/login')}
         />
       );
     }
@@ -156,7 +141,6 @@ function App() {
     return (
       <Login
         toggleToRegister={() => navigate('/register')}
-        toggleToSetup={() => navigate('/new-login')}
       />
     );
   }
@@ -180,7 +164,6 @@ function App() {
             <Settings />
           </div>
         ) : (
-          /* Dashboard Route Content */
           <>
             <DashboardHeader holdings={holdings} marketData={marketData} />
             <div className="layout-grid-system">

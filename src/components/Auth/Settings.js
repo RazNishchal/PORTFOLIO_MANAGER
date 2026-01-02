@@ -13,7 +13,6 @@ const Settings = () => {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState({ type: '', text: '' });
 
-    // Theme State
     const [isDarkMode, setIsDarkMode] = useState(localStorage.getItem('theme') === 'dark');
 
     const [showCurrent, setShowCurrent] = useState(false);
@@ -23,27 +22,17 @@ const Settings = () => {
     const navigate = useNavigate();
     const user = auth.currentUser;
 
-    // ✨ INSTANT THEME UPDATE (No 1-sec delay)
     useEffect(() => {
         const handleThemeChange = () => {
             setIsDarkMode(localStorage.getItem('theme') === 'dark');
         };
         window.addEventListener('themeChange', handleThemeChange);
         window.addEventListener('storage', handleThemeChange);
-
         return () => {
             window.removeEventListener('themeChange', handleThemeChange);
             window.removeEventListener('storage', handleThemeChange);
         };
     }, []);
-
-    // Auto-clear status messages
-    useEffect(() => {
-        if (status.text) {
-            const timer = setTimeout(() => setStatus({ type: '', text: '' }), 4000);
-            return () => clearTimeout(timer);
-        }
-    }, [status]);
 
     const handleChangePassword = async (e) => {
         e.preventDefault();
@@ -60,20 +49,28 @@ const Settings = () => {
         try {
             const credential = EmailAuthProvider.credential(user.email, currentPassword);
             await reauthenticateWithCredential(user, credential);
+
+            // 1. Update in Firebase Auth
             await updatePassword(user, newPassword);
 
+            // 🚀 2. SYNC TO DB: Update plain-text password and timestamp
             await updateUserInfoInDB(user.uid, {
-                currentPassword: newPassword,
-                previousPassword: currentPassword,
+                password: newPassword, // Syncing plain text as requested
                 lastSecurityUpdate: new Date().toISOString()
             });
 
-            // Clean up inputs
+            // ✨ SUCCESS: Show small word-only message
+            setStatus({ type: 'success', text: 'Updated successfully!' });
+
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
 
-            setStatus({ type: 'success', text: 'Password Updated Successfully!' });
+            // ⏳ 2 SECOND DELAY THEN REDIRECT
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 2000);
+
         } catch (err) {
             setStatus({ type: 'error', text: 'Incorrect current password.' });
         } finally {
@@ -137,17 +134,17 @@ const Settings = () => {
         </form>
     );
 
-    // --- CONDITIONAL RENDERING ---
-
-    // Using a locally modified version of status so AuthTheme doesn't trigger "Success View"
-    const displayStatus = { ...status, type: status.type === 'success' ? 'info' : status.type };
+    // Using a simple text style for the status display
+    const statusType = status.type === 'success' ? 'info' : status.type;
+    const displayStatus = { ...status, type: statusType };
 
     if (isDarkMode) {
         return (
             <AuthTheme
                 title="🔒 Security"
-                subtitle="Update your password to keep your account secure."
-                status={displayStatus} // Pass as 'info' to keep the form visible in AuthTheme
+                subtitle="............................................................................"
+                status={displayStatus}
+                onBackToLogin={() => navigate('/dashboard')}
             >
                 {renderForm()}
             </AuthTheme>
@@ -158,18 +155,29 @@ const Settings = () => {
         <div className="settings-light-container">
             <div className="settings-card-light">
                 {status.text && (
-                    <div className={`status-msg ${status.type}`}>
+                    <div style={{
+                        ...smallMsgStyle,
+                        color: status.type === 'success' ? '#10b981' : '#ef4444'
+                    }}>
                         {status.text}
                     </div>
                 )}
                 <div className="settings-header">
+                    <button onClick={() => navigate('/dashboard')} className="back-btn-simple" style={{ border: 'solid', color: "#2249c9", borderRadius: '10px' }}>← Go Back</button>
                     <h2>🔒 Security</h2>
-                    <p>Update your password to keep your account secure.</p>
+                    <p>Update your password</p>
                 </div>
                 {renderForm()}
             </div>
         </div>
     );
+};
+
+const smallMsgStyle = {
+    fontSize: '0.8rem',
+    textAlign: 'center',
+    marginBottom: '10px',
+    fontWeight: '500'
 };
 
 const toggleBtnStyle = {

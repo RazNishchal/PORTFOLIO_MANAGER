@@ -1,25 +1,24 @@
-// src/components/Auth/Login.jsx
 import React, { useState, useEffect } from 'react';
 import AuthTheme from './AuthTheme';
 import {
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
-    sendEmailVerification,
     signOut
 } from 'firebase/auth';
 import { auth, APP_URL } from '../../firebase';
 import { updateUserInfoInDB } from '../../services/portfolioService';
 
-const Login = ({ toggleToRegister, toggleToSetup }) => { // Added toggleToSetup prop
+const Login = ({ toggleToRegister }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [status, setStatus] = useState({ type: '', text: '' });
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [resetMode, setResetMode] = useState(false);
 
     useEffect(() => {
         if (status.text) {
-            const timer = setTimeout(() => setStatus({ type: '', text: '' }), 4000);
+            const timer = setTimeout(() => setStatus({ type: '', text: '' }), 2000);
             return () => clearTimeout(timer);
         }
     }, [status]);
@@ -32,11 +31,11 @@ const Login = ({ toggleToRegister, toggleToSetup }) => { // Added toggleToSetup 
 
             if (!userCred.user.emailVerified) {
                 setStatus({ type: 'error', text: 'Please verify your email first!' });
+                setResetMode(true);
                 await signOut(auth);
             } else {
                 await updateUserInfoInDB(userCred.user.uid, {
                     email: email,
-                    currentPassword: password,
                     lastLogin: new Date().toISOString()
                 });
             }
@@ -47,31 +46,13 @@ const Login = ({ toggleToRegister, toggleToSetup }) => { // Added toggleToSetup 
         }
     };
 
-    const handleResendVerification = async () => {
-        if (!email || !password) {
-            return setStatus({ type: 'error', text: 'Enter credentials to resend link.' });
-        }
-        setLoading(true);
-        try {
-            const userCred = await signInWithEmailAndPassword(auth, email, password);
-            await sendEmailVerification(userCred.user, {
-                url: `${APP_URL}/new-login`, // Directs them to setup
-            });
-            await signOut(auth);
-            setStatus({ type: 'success', text: 'A fresh link has been sent to your Gmail!' });
-        } catch (err) {
-            setStatus({ type: 'error', text: 'Check your email/password again.' });
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleForgotPassword = async () => {
         if (!email) return setStatus({ type: 'error', text: 'Please enter your email first.' });
         setLoading(true);
         try {
             await sendPasswordResetEmail(auth, email, { url: APP_URL });
-            setStatus({ type: 'success', text: 'Password reset link sent! Check your Gmail.' });
+            setStatus({ type: 'success', text: 'Reset link sent! Check your Gmail.' });
+            setResetMode(true);
         } catch (err) {
             setStatus({ type: 'error', text: 'Account not found.' });
         } finally {
@@ -81,17 +62,20 @@ const Login = ({ toggleToRegister, toggleToSetup }) => { // Added toggleToSetup 
 
     return (
         <AuthTheme
-            title="Welcome Back"
-            subtitle="Enter your details to manage your IPOs"
+            title="Login"
+            subtitle="Enter your details to manage your portfolio"
             status={status}
-            onBackToLogin={() => setStatus({ type: '', text: '' })}
+            onBackToLogin={() => {
+                setStatus({ type: '', text: '' });
+                setResetMode(false);
+            }}
         >
             <form onSubmit={handleLogin} className="auth-form-body">
                 <div className="input-field">
                     <label>Email Address</label>
                     <input
                         type="email"
-                        placeholder="name@company.com"
+                        placeholder="mail@mail.com"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         required
@@ -103,7 +87,7 @@ const Login = ({ toggleToRegister, toggleToSetup }) => { // Added toggleToSetup 
                     <div className="password-input-wrapper" style={{ position: 'relative' }}>
                         <input
                             type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
+                            placeholder="********"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
                             required
@@ -118,28 +102,39 @@ const Login = ({ toggleToRegister, toggleToSetup }) => { // Added toggleToSetup 
                     </div>
                 </div>
 
-                <div className="forgot-link-container" style={{ display: 'flex', justifyContent: 'space-between', margin: '1rem 0' }}>
-                    <span onClick={handleForgotPassword} className="link-btn-small" style={linkStyle}>Forgot Password?</span>
-                    <span onClick={handleResendVerification} className="link-btn-small" style={{ ...linkStyle, color: '#64748b' }}>Resend Link?</span>
+                <div className="forgot-link-container" style={flexBetweenStyle}>
+                    <span
+                        onClick={!resetMode ? handleForgotPassword : null}
+                        className="link-btn-small"
+                        style={{
+                            ...linkStyle,
+                            color: resetMode ? '#64748b' : '#38bdf8',
+                            cursor: resetMode ? 'default' : 'pointer',
+                            opacity: resetMode ? 0.5 : 1,
+                            pointerEvents: resetMode ? 'none' : 'auto'
+                        }}
+                    >
+                        Forgot Password?
+                    </span>
+
+                    {resetMode && (
+                        <span
+                            onClick={handleForgotPassword}
+                            className="link-btn-small"
+                            style={{ ...linkStyle, color: '#10b981', fontWeight: 'bold' }}
+                        >
+                            Resend Link?
+                        </span>
+                    )}
                 </div>
 
-                <button type="submit" className="btn-auth" disabled={loading} style={{ width: '100%' }}>
+                <button type="submit" className="btn-auth" disabled={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
                     {loading ? "Authenticating..." : "Sign In"}
                 </button>
-
-                {/* NEW SETUP PASSWORD LINK */}
-                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    <span
-                        onClick={toggleToSetup}
-                        style={{ ...linkStyle, fontSize: '0.8rem', opacity: 0.8 }}
-                    >
-                        First time? Setup Password
-                    </span>
-                </div>
             </form>
 
             <div className="auth-footer" style={{ marginTop: '2rem', textAlign: 'center' }}>
-                <p style={{ fontSize: '0.9rem' }}>Don't have an account?
+                <p style={{ fontSize: '0.9rem', color: '#94a3b8' }}>Don't have an account?
                     <button
                         onClick={toggleToRegister}
                         className="link-btn"
@@ -153,7 +148,9 @@ const Login = ({ toggleToRegister, toggleToSetup }) => { // Added toggleToSetup 
     );
 };
 
-const linkStyle = { cursor: 'pointer', fontSize: '0.85rem', color: '#38bdf8' };
+// Styles
+const linkStyle = { cursor: 'pointer', fontSize: '0.85rem' };
+const flexBetweenStyle = { display: 'flex', justifyContent: 'space-between', margin: '1rem 0', minHeight: '1.2rem' };
 
 const registerBtnStyle = {
     background: 'none',
@@ -172,7 +169,8 @@ const toggleBtnStyle = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    fontSize: '1.2rem'
+    fontSize: '1.2rem',
+    color: '#64748b'
 };
 
 export default Login;
