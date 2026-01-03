@@ -5,6 +5,7 @@
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
+/* --- DESKTOP CONTAINER (NO CHANGES) --- */
 .market-movers-container {
     display: flex;
     gap: 24px;
@@ -75,22 +76,12 @@
 
 .mover-row:hover {
     background: var(--bg-input);
-    padding-left: 28px; /* Subtle slide effect */
+    padding-left: 28px;
 }
 
 /* --- SYMBOL & PRICE --- */
-.symbol-text {
-    font-weight: 900;
-    font-size: 1rem;
-    color: var(--text-primary);
-}
-
-.ltp-value {
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
+.symbol-text { font-weight: 900; font-size: 1rem; color: var(--text-primary); }
+.ltp-value { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
 
 /* --- PROFESSIONAL PILLS --- */
 .change-pill {
@@ -119,7 +110,48 @@
 .stat-point { font-weight: 800; font-size: 0.85rem; }
 .stat-perc { font-size: 0.7rem; font-weight: 600; opacity: 0.8; }
 
-/* Responsive */
+/* --- 📱 MOBILE ONLY OVERRIDES (SLIDER) --- */
 @media (max-width: 900px) {
-    .market-movers-container { flex-direction: column; }
+    .market-movers-container {
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        padding-bottom: 25px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* 🪄 Visible Scrollbar for Mobile Only */
+    .market-movers-container::-webkit-scrollbar {
+        height: 6px !important;
+        display: block !important;
+    }
+
+    .market-movers-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .market-movers-container::-webkit-scrollbar-thumb {
+        background: var(--text-secondary);
+        border-radius: 10px;
+        opacity: 0.2;
+    }
+
+    .mover-column {
+        min-width: 85vw;
+        flex-shrink: 0;
+        scroll-snap-align: center;
+    }
+
+    /* 🛠️ FIX: Grid spacing to prevent center overlap */
+    .mover-header, .mover-row {
+        /* Ticker: 75px | Price: Flexible (center) | Performance: 100px (right) */
+        grid-template-columns: 75px 1fr 100px !important; 
+        padding: 12px 12px !important;
+        column-gap: 8px; /* Added hard gap */
+    }
+
+    .ltp-value {
+        text-align: center; /* Keeps price in the middle channel */
+        font-size: 0.8rem;
+    }
 }

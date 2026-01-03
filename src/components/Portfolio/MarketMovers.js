@@ -11,7 +11,7 @@ const MarketMovers = ({ marketData, isDarkMode }) => {
         .slice(0, 5);
 
     const StockSection = ({ title, type, data }) => (
-        <div className={`mover-column ${type}`}>
+        <div className={`mover-column ${type}`} style={{ flexShrink: 0 }}>
             <div className="mover-title">
                 <span>{title}</span>
                 <span className="icon-badge">{type === 'gainers' ? '▲' : '▼'}</span>
@@ -51,6 +51,7 @@ const MarketMovers = ({ marketData, isDarkMode }) => {
     );
 
     return (
+        /* The container now handles the horizontal swipe logic via CSS */
         <div className={`market-movers-container ${isDarkMode ? 'dark-mode' : ''}`}>
             <StockSection title="Top Gainers" type="gainers" data={getTop(true)} />
             <StockSection title="Top Losers" type="losers" data={getTop(false)} />

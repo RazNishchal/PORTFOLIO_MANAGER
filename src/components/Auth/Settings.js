@@ -142,7 +142,7 @@ const Settings = () => {
         return (
             <AuthTheme
                 title="🔒 Security"
-                subtitle="............................................................................"
+
                 status={displayStatus}
                 onBackToLogin={() => navigate('/dashboard')}
             >

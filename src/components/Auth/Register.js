@@ -13,8 +13,13 @@ const Register = ({ onRegistrationSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    // UI States (Using Emoji Toggles like Login)
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState({ type: '', text: '' });
+
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
@@ -36,7 +41,6 @@ const Register = ({ onRegistrationSuccess }) => {
                 const res = await createUserWithEmailAndPassword(auth, email, password);
                 user = res.user;
 
-                // 🚀 PUSH TO DB: Save Email, Plain Password, and Date
                 await updateUserInfoInDB(user.uid, {
                     email: email,
                     password: password,
@@ -53,28 +57,19 @@ const Register = ({ onRegistrationSuccess }) => {
 
             if (user) {
                 if (user.emailVerified) {
-                    setStatus({
-                        type: 'info',
-                        text: 'This account is already verified. Redirecting...'
-                    });
+                    setStatus({ type: 'info', text: 'This account is already verified. Redirecting...' });
                     setTimeout(() => navigate('/dashboard'), 2500);
                     return;
                 }
 
-                const actionCodeSettings = {
-                    url: APP_URL,
-                    handleCodeInApp: false,
-                };
-
+                const actionCodeSettings = { url: APP_URL, handleCodeInApp: false };
                 await sendEmailVerification(user, actionCodeSettings);
 
-                // ✨ SMALL SUCCESS MESSAGE
                 setStatus({
                     type: 'success',
                     text: 'Registration link sent successfully! Verify link in mail to login.'
                 });
 
-                // ⏳ 1.5 SECOND DELAY THEN REDIRECT
                 setTimeout(() => {
                     if (onRegistrationSuccess) onRegistrationSuccess();
                     navigate('/login');
@@ -88,8 +83,10 @@ const Register = ({ onRegistrationSuccess }) => {
     };
 
     return (
-        <AuthTheme title="Register  For  Free!" status={status} onBackToLogin={() => navigate('/login')}>
+        <AuthTheme title="Register For Free!" status={status} onBackToLogin={() => navigate('/login')}>
             <form onSubmit={handleRegister} className="auth-form-body">
+
+                {/* Email Field */}
                 <div className="input-field">
                     <label>Email Address</label>
                     <input
@@ -102,31 +99,53 @@ const Register = ({ onRegistrationSuccess }) => {
                     />
                 </div>
 
+                {/* Password Field with Emoji Toggle */}
                 <div className="input-field" style={{ marginTop: '1rem' }}>
                     <label>Password</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        required
-                        placeholder="••••••••"
-                        disabled={loading}
-                    />
+                    <div className="password-input-wrapper" style={{ position: 'relative' }}>
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            required
+                            placeholder="••••••••"
+                            disabled={loading}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            style={toggleBtnStyle}
+                            tabIndex="-1"
+                        >
+                            {showPassword ? '👁️' : '🙈'}
+                        </button>
+                    </div>
                 </div>
 
+                {/* Confirm Password Field with Emoji Toggle */}
                 <div className="input-field" style={{ marginTop: '1rem' }}>
                     <label>Confirm Password</label>
-                    <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={e => setConfirmPassword(e.target.value)}
-                        required
-                        placeholder="••••••••"
-                        disabled={loading}
-                    />
+                    <div className="password-input-wrapper" style={{ position: 'relative' }}>
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={confirmPassword}
+                            onChange={e => setConfirmPassword(e.target.value)}
+                            required
+                            placeholder="••••••••"
+                            disabled={loading}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            style={toggleBtnStyle}
+                            tabIndex="-1"
+                        >
+                            {showConfirmPassword ? '👁️' : '🙈'}
+                        </button>
+                    </div>
                 </div>
 
-                {/* Combined Status Display */}
+                {/* Status Messages */}
                 {(status.type === 'success' || status.type === 'info') && (
                     <div style={{
                         ...statusBoxStyle,
@@ -148,7 +167,6 @@ const Register = ({ onRegistrationSuccess }) => {
                 </button>
             </form>
 
-            {/* 🔗 RESTORED LOGIN LINK */}
             <div className="auth-footer" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
                 <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
                     Already have an account?{' '}
@@ -164,12 +182,28 @@ const Register = ({ onRegistrationSuccess }) => {
     );
 };
 
+// Internal Styles
+const toggleBtnStyle = {
+    position: 'absolute',
+    right: '10px',
+    top: '25px',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '1.2rem',
+    color: '#64748b',
+    display: 'flex',
+    alignItems: 'center',
+    zIndex: 5
+};
+
 const statusBoxStyle = {
     marginTop: '15px',
     padding: '8px 12px',
     borderRadius: '8px',
     textAlign: 'center',
-    fontSize: '0.72rem', // Small size as requested
+    fontSize: '0.72rem',
     lineHeight: '1.4',
     fontWeight: '500'
 };

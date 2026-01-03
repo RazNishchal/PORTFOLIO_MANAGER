@@ -3,18 +3,19 @@
 /* --- MASTER WRAPPER --- */
 .auth-page-wrapper {
     min-height: 100vh;
-    width: 100vw;
+    min-height: 100dvh; 
+    width: 100%;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; 
-    position: fixed; 
-    top: 0;
-    left: 0;
+    position: relative; 
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch;
     font-family: 'Plus Jakarta Sans', sans-serif;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
 }
 
 /* 🌑 PREMIUM DARK MODE */
@@ -22,7 +23,7 @@
     background: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
                 radial-gradient(at 50% 0%, rgb(56, 87, 181) 0, transparent 50%), 
                 radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-    background-color: #1e2433; /* Darker base for better contrast */
+    background-color: #1e2433;
 }
 
 .auth-dark-mode .auth-card {
@@ -30,31 +31,6 @@
     backdrop-filter: blur(25px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-/* ✨ Fix: Label Color set to WHITE for Dark Mode */
-.auth-dark-mode label {
-    color: #ffffff !important; /* Set to white as requested */
-    font-weight: 600;
-    letter-spacing: 0.025em;
-    opacity: 0.9;
-}
-
-.auth-dark-mode h1 {
-    background: linear-gradient(to bottom right, #fff, #b8c1ce);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-
-.auth-light-mode p { color: #c3cbd5;;
-font-size: 0.9rem; text-align:center; }
-
-
-.auth-dark-mode input {
-    background: rgba(15, 22, 54, 0.5) !important;
-    border: 1px solid rgba(56, 189, 248, 0.2);
-    color: #f8fafc !important;
 }
 
 /* ☀️ PREMIUM LIGHT MODE */
@@ -69,73 +45,86 @@ font-size: 0.9rem; text-align:center; }
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 1);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
-/* ✨ Fix: Label Color set to DARK for Light Mode */
-.auth-light-mode label {
-    color: #0f172a !important; /* Set to dark slate for readability */
-    font-weight: 600;
+/* ✨ BALANCED HEADER TYPOGRAPHY */
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem; 
 }
 
-.auth-light-mode h1 { color: #0f172a; }
-.auth-light-mode p { color: #64748b;
-font-size: 0.9rem; text-align:center; }
-
-
-
-.auth-light-mode input {
-    background: rgba(241, 245, 249, 0.7) !important;
-    border: 1px solid #e2e8f0;
-    color: #0f172a !important;
+.auth-header h1 {
+    font-size: clamp(1.8rem, 5vw, 2.5rem) !important;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
 }
+
+.auth-dark-mode .auth-header h1 {
+    background: linear-gradient(to bottom right, #ffffff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-light-mode .auth-header h1 { color: #0f172a; }
 
 /* --- SHARED STYLES --- */
 .auth-card {
-    width: 100%;
-    max-width: 440px;
-    padding: 3rem;
-    border-radius: 32px;
+    width: 90%;
+    max-width: 420px;
+    padding: clamp(1.5rem, 5vw, 2.8rem); 
+    border-radius: 28px;
+    margin: 2rem auto; 
     animation: authReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
 }
 
 label {
     display: block;
-    margin-bottom: 8px; /* Increased spacing */
-    font-size: 1rem;
-    transition: color 0.3s ease;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
+
+.auth-dark-mode label { color: #ffffff !important; opacity: 0.9; }
+.auth-light-mode label { color: #0f172a !important; }
 
 input {
     width: 100%;
-    height: 52px;
-    padding: 0 1.25rem;
-    margin-bottom: 1.25rem;
-    border-radius: 16px;
-    font-size: 1rem;
+    height: 50px;
+    padding: 0 1rem;
+    margin-bottom: 1.1rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
     outline: none;
+    box-sizing: border-box;
     transition: all 0.2s ease;
 }
 
+/* --- BREAKPOINTS --- */
+@media (max-width: 480px) {
+    .auth-page-wrapper {
+        align-items: flex-start; 
+        padding: 0.5rem 0 0 0;
+    }
 
-input:focus {
-    border-color: #38bdf8 !important;
-    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+    .auth-card {
+        width: 100%;
+        margin: 0;
+        border-radius: 28px 28px 0 0;
+        min-height: 95vh;
+        padding: 2rem 1.25rem;
+    }
+
+    .auth-header h1 {
+        font-size: 2rem !important;
+    }
 }
-
-.status-msg {
-    padding: 1rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-align: center;
-}
-
-.status-msg.error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
-.status-msg.success { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
 
 @keyframes authReveal {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
