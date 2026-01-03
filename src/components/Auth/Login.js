@@ -16,15 +16,27 @@ const Login = ({ toggleToRegister }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [resetMode, setResetMode] = useState(false);
 
+    // Effect to clear status after 1.5 seconds
     useEffect(() => {
         if (status.text) {
-            const timer = setTimeout(() => setStatus({ type: '', text: '' }), 2000);
+            const timer = setTimeout(() => {
+                setStatus({ type: '', text: '' });
+            }, 1500);
             return () => clearTimeout(timer);
         }
     }, [status]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
+
+        // Manual validation: triggers your custom message instead of HTML popup
+        if (!email) {
+            return setStatus({ type: 'error', text: 'Email is required' });
+        }
+        if (!password) {
+            return setStatus({ type: 'error', text: 'Password is required' });
+        }
+
         setLoading(true);
         try {
             const userCred = await signInWithEmailAndPassword(auth, email, password);
@@ -47,7 +59,7 @@ const Login = ({ toggleToRegister }) => {
     };
 
     const handleForgotPassword = async () => {
-        if (!email) return setStatus({ type: 'error', text: 'Please enter your email first.' });
+        if (!email) return setStatus({ type: 'error', text: 'Email is required' });
         setLoading(true);
         try {
             await sendPasswordResetEmail(auth, email, { url: APP_URL });
@@ -60,17 +72,31 @@ const Login = ({ toggleToRegister }) => {
         }
     };
 
+    // Inline style for the status message
+    const statusMessageStyle = {
+        fontSize: '0.85rem',
+        color: status.type === 'success' ? '#10b981' : '#ef4444',
+        textAlign: 'center',
+        marginBottom: '1rem',
+        minHeight: '1.2rem',
+        fontWeight: '500'
+    };
+
     return (
         <AuthTheme
             title="Login"
-
-            status={status}
             onBackToLogin={() => {
                 setStatus({ type: '', text: '' });
                 setResetMode(false);
             }}
         >
-            <form onSubmit={handleLogin} className="auth-form-body">
+            {/* Status Message Display */}
+            <div style={statusMessageStyle}>
+                {status.text ? status.text : ""}
+            </div>
+
+            {/* noValidate stops the browser from showing its own "Fill in this field" popup */}
+            <form onSubmit={handleLogin} className="auth-form-body" noValidate>
                 <div className="input-field">
                     <label>Email Address</label>
                     <input
@@ -78,7 +104,6 @@ const Login = ({ toggleToRegister }) => {
                         placeholder="mail@mail.com"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
-                        required
                     />
                 </div>
 
@@ -90,7 +115,6 @@ const Login = ({ toggleToRegister }) => {
                             placeholder="••••••••"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
-                            required
                         />
                         <button
                             type="button"
@@ -148,29 +172,9 @@ const Login = ({ toggleToRegister }) => {
     );
 };
 
-// Styles
 const linkStyle = { cursor: 'pointer', fontSize: '0.85rem' };
 const flexBetweenStyle = { display: 'flex', justifyContent: 'space-between', margin: '1rem 0', minHeight: '1.2rem' };
-
-const registerBtnStyle = {
-    background: 'none',
-    border: 'none',
-    color: '#38bdf8',
-    cursor: 'pointer',
-    fontWeight: '600',
-    marginLeft: '5px'
-};
-
-const toggleBtnStyle = {
-    position: 'absolute',
-    right: '10px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '1.2rem',
-    color: '#64748b'
-};
+const registerBtnStyle = { background: 'none', border: 'none', color: '#38bdf8', cursor: 'pointer', fontWeight: '600', marginLeft: '5px' };
+const toggleBtnStyle = { position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#64748b' };
 
 export default Login;

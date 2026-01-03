@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthTheme from './AuthTheme';
 import {
@@ -13,8 +13,6 @@ const Register = ({ onRegistrationSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-
-    // UI States (Using Emoji Toggles like Login)
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -22,9 +20,23 @@ const Register = ({ onRegistrationSuccess }) => {
 
     const navigate = useNavigate();
 
+    // Effect to clear status after exactly 1.5 seconds
+    useEffect(() => {
+        if (status.text) {
+            const timer = setTimeout(() => {
+                setStatus({ type: '', text: '' });
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [status]);
+
     const handleRegister = async (e) => {
         e.preventDefault();
 
+        // Manual validation: replaced HTML popups with custom status
+        if (!email) {
+            return setStatus({ type: 'error', text: 'Email is required' });
+        }
         if (password.length < 8) {
             return setStatus({ type: 'error', text: 'Password must be at least 8 characters.' });
         }
@@ -57,8 +69,8 @@ const Register = ({ onRegistrationSuccess }) => {
 
             if (user) {
                 if (user.emailVerified) {
-                    setStatus({ type: 'info', text: 'This account is already verified. Redirecting...' });
-                    setTimeout(() => navigate('/dashboard'), 2500);
+                    setStatus({ type: 'info', text: 'account already verified. redirecting...' });
+                    setTimeout(() => navigate('/dashboard'), 1500);
                     return;
                 }
 
@@ -67,7 +79,7 @@ const Register = ({ onRegistrationSuccess }) => {
 
                 setStatus({
                     type: 'success',
-                    text: 'Registration link sent successfully! Verify link in mail to login.'
+                    text: 'Registration link sent! Verify mail to login.'
                 });
 
                 setTimeout(() => {
@@ -76,30 +88,49 @@ const Register = ({ onRegistrationSuccess }) => {
                 }, 1500);
             }
         } catch (err) {
-            setStatus({ type: 'error', text: err.message });
+            // Convert Firebase errors to lowercase or custom messages as needed
+            setStatus({ type: 'error', text: err.message.toLowerCase() });
         } finally {
             setLoading(false);
         }
     };
 
-    return (
-        <AuthTheme title="Register" status={status} onBackToLogin={() => navigate('/login')}>
-            <form onSubmit={handleRegister} className="auth-form-body">
+    // Style configuration
+    const statusMessageStyle = {
+        fontSize: '0.85rem',
+        color: status.type === 'error' ? '#ef4444' : '#10b981',
+        textAlign: 'center',
+        marginBottom: '1rem',
+        minHeight: '1.2rem',
+        fontWeight: '500'
+    };
 
-                {/* Email Field */}
+    return (
+        <AuthTheme
+            title="Register"
+            /* Pass status only for logic checks like success view, 
+               AuthTheme no longer renders the text itself */
+            status={status}
+            onBackToLogin={() => navigate('/login')}
+        >
+            {/* Unified Status Display */}
+            <div style={statusMessageStyle}>
+                {status.text ? status.text : ""}
+            </div>
+
+            {/* noValidate stops the browser from showing its own "Fill in this field" popup */}
+            <form onSubmit={handleRegister} className="auth-form-body" noValidate>
                 <div className="input-field">
                     <label>Email Address</label>
                     <input
                         type="email"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
-                        required
                         placeholder="mail@mail.com"
                         disabled={loading}
                     />
                 </div>
 
-                {/* Password Field with Emoji Toggle */}
                 <div className="input-field" style={{ marginTop: '1rem' }}>
                     <label>Password</label>
                     <div className="password-input-wrapper" style={{ position: 'relative' }}>
@@ -107,7 +138,6 @@ const Register = ({ onRegistrationSuccess }) => {
                             type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={e => setPassword(e.target.value)}
-                            required
                             placeholder="••••••••"
                             disabled={loading}
                         />
@@ -122,7 +152,6 @@ const Register = ({ onRegistrationSuccess }) => {
                     </div>
                 </div>
 
-                {/* Confirm Password Field with Emoji Toggle */}
                 <div className="input-field" style={{ marginTop: '1rem' }}>
                     <label>Confirm Password</label>
                     <div className="password-input-wrapper" style={{ position: 'relative' }}>
@@ -130,7 +159,6 @@ const Register = ({ onRegistrationSuccess }) => {
                             type={showConfirmPassword ? "text" : "password"}
                             value={confirmPassword}
                             onChange={e => setConfirmPassword(e.target.value)}
-                            required
                             placeholder="••••••••"
                             disabled={loading}
                         />
@@ -145,25 +173,13 @@ const Register = ({ onRegistrationSuccess }) => {
                     </div>
                 </div>
 
-                {/* Status Messages */}
-                {(status.type === 'success' || status.type === 'info') && (
-                    <div style={{
-                        ...statusBoxStyle,
-                        backgroundColor: status.type === 'info' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-                        border: status.type === 'info' ? '1px solid #3b82f6' : '1px solid #10b981',
-                        color: status.type === 'info' ? '#3b82f6' : '#10b981',
-                    }}>
-                        {status.text}
-                    </div>
-                )}
-
                 <button
                     type="submit"
                     className="btn-auth"
-                    disabled={loading || status.type === 'success' || status.type === 'info'}
+                    disabled={loading || status.type === 'success'}
                     style={{ width: '100%', marginTop: '1.5rem' }}
                 >
-                    {loading ? 'Processing...' : 'Register & Verify'}
+                    {loading ? 'processing...' : 'Register & Verify'}
                 </button>
             </form>
 
@@ -174,7 +190,7 @@ const Register = ({ onRegistrationSuccess }) => {
                         onClick={() => navigate('/login')}
                         style={{ color: '#3b82f6', cursor: 'pointer', fontWeight: '600' }}
                     >
-                        Login here
+                        Login Here
                     </span>
                 </p>
             </div>
@@ -182,11 +198,10 @@ const Register = ({ onRegistrationSuccess }) => {
     );
 };
 
-// Internal Styles
 const toggleBtnStyle = {
     position: 'absolute',
     right: '10px',
-    top: '25px',
+    top: '50%',
     transform: 'translateY(-50%)',
     background: 'none',
     border: 'none',
@@ -196,16 +211,6 @@ const toggleBtnStyle = {
     display: 'flex',
     alignItems: 'center',
     zIndex: 5
-};
-
-const statusBoxStyle = {
-    marginTop: '15px',
-    padding: '8px 12px',
-    borderRadius: '8px',
-    textAlign: 'center',
-    fontSize: '0.72rem',
-    lineHeight: '1.4',
-    fontWeight: '500'
 };
 
 export default Register;
