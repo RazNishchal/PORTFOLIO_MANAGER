@@ -62,8 +62,8 @@ const Login = ({ toggleToRegister }) => {
 
     return (
         <AuthTheme
-            title="Login For Free!"
-            subtitle="Enter your details to manage your portfolio"
+            title="Login"
+
             status={status}
             onBackToLogin={() => {
                 setStatus({ type: '', text: '' });

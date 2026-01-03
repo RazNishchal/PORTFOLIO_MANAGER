@@ -95,22 +95,29 @@
   letter-spacing: 0.05em;
 }
 
+/* Update this in your Auth/Login CSS file */
 .input-field input {
-  width: 100%;
-  padding: 0.85rem 1.1rem;
-  border: 1.5px solid var(--input-border);
-  border-radius: 0.85rem;
-  font-size: 1rem;
-  background-color: var(--input-bg);
-  color: var(--input-text);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-input, #f8fafc); /* Light subtle background */
+    border: 1px solid #e2e8f0; /* Light border color to match your password field */
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    outline: none; /* Removes the default thick browser outline */
 }
 
+/* Hover & Focus state for a premium feel */
 .input-field input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-  background-color: var(--card-bg);
+    border-color: #3b82f6; /* Subtle blue highlight on focus */
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Ensure the wrapper for password doesn't add extra borders */
+.password-input-wrapper input {
+    border: 1px solid #e2e8f0 !important;
 }
 
 /* --- Buttons --- */
