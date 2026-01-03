@@ -127,7 +127,7 @@ input {
 
 .auth-dark-mode input:focus {
     border-color: #38bdf8 !important;
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: #ffffff !important;
     box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
 }
 
