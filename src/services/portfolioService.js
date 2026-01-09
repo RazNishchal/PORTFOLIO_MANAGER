@@ -3,11 +3,19 @@ import { ref, push, update, onValue, get } from "firebase/database";
 
 /**
  * 🕒 PRIVATE HELPER: Get Kathmandu Local Time
- * Returns a string: "MM/DD/YYYY, HH:MM:SS AM/PM"
+ * Returns a readable string: "MM/DD/YYYY, HH:MM:SS AM/PM"
+ * This handles the unique +5:45 offset for Nepal.
  */
 const getKTMTime = () => {
     return new Date().toLocaleString("en-US", {
         timeZone: "Asia/Kathmandu",
+        hour12: true,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
     });
 };
 
@@ -48,18 +56,31 @@ export const getUserInfoFromDB = async (userId) => {
 
 /**
  * 👤 UPDATE USER INFO
- * Uses Kathmandu time for tracking profile updates.
+ * Fixes: createdAt (if new), lastActive, and lastModified to Nepal Time.
  */
 export const updateUserInfoInDB = async (userId, data) => {
     if (!userId) return;
     try {
         const userInfoRef = ref(db, `users/${userId}/userInfo`);
+        const ktmNow = getKTMTime();
+        
+        // Fetch current data to see if createdAt exists
+        const snapshot = await get(userInfoRef);
+        const currentData = snapshot.val() || {};
 
-        await update(userInfoRef, {
+        const updates = {
             ...data,
-            lastModified: getKTMTime(), // Updated to KTM Local
+            lastActive: ktmNow,    // Replaces ISO UTC with KTM Local
+            lastModified: ktmNow,  // Replaces ISO UTC with KTM Local
             serverTimestamp: Date.now()
-        });
+        };
+
+        // If createdAt doesn't exist in DB, this is a new user setup
+        if (!currentData.createdAt) {
+            updates.createdAt = ktmNow;
+        }
+
+        await update(userInfoRef, updates);
     } catch (error) {
         console.error("Error updating user info in DB:", error);
     }
@@ -67,7 +88,6 @@ export const updateUserInfoInDB = async (userId, data) => {
 
 /**
  * 🚀 UPDATE PORTFOLIO
- * Updates holdings and transactions using Kathmandu time.
  */
 export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, marketData = {}) => {
     const symbol = tx.symbol.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
@@ -91,7 +111,7 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
     }
 
     const updates = {};
-    const ktmNow = getKTMTime(); // Captured once for atomicity
+    const ktmNow = getKTMTime();
 
     // 1. Update Holdings
     const holdingPath = `users/${userId}/holdings/${symbol}`;
@@ -112,11 +132,12 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
         units: txUnits,
         price: txPrice,
         timestamp: Date.now(),
-        createdAtKTM: ktmNow // Added for readable Nepal history
+        createdAtKTM: ktmNow // Explicit local time for transaction history
     };
 
     // 3. Update User Metadata
-    updates[`users/${userId}/userInfo/lastTransactionAt`] = ktmNow; // Updated to KTM Local
+    updates[`users/${userId}/userInfo/lastTransactionAt`] = ktmNow;
+    updates[`users/${userId}/userInfo/lastActive`] = ktmNow;
 
     await update(ref(db), updates);
     return pruneTransactions(userId);
