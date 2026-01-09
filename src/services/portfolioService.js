@@ -4,7 +4,6 @@ import { ref, push, update, onValue, get } from "firebase/database";
 /**
  * 🕒 PRIVATE HELPER: Get Kathmandu Local Time
  * Returns a readable string: "MM/DD/YYYY, HH:MM:SS AM/PM"
- * This handles the unique +5:45 offset for Nepal.
  */
 const getKTMTime = () => {
     return new Date().toLocaleString("en-US", {
@@ -56,7 +55,7 @@ export const getUserInfoFromDB = async (userId) => {
 
 /**
  * 👤 UPDATE USER INFO
- * Fixes: createdAt (if new), lastActive, and lastModified to Nepal Time.
+ * Fixes: createdAt, lastActive, and lastModified to Kathmandu Time.
  */
 export const updateUserInfoInDB = async (userId, data) => {
     if (!userId) return;
@@ -64,20 +63,20 @@ export const updateUserInfoInDB = async (userId, data) => {
         const userInfoRef = ref(db, `users/${userId}/userInfo`);
         const ktmNow = getKTMTime();
         
-        // Fetch current data to see if createdAt exists
+        // Check current data to see if createdAt already exists
         const snapshot = await get(userInfoRef);
         const currentData = snapshot.val() || {};
 
         const updates = {
             ...data,
-            lastActive: ktmNow,    // Replaces ISO UTC with KTM Local
-            lastModified: ktmNow,  // Replaces ISO UTC with KTM Local
+            lastActive: ktmNow,    // Nepal Local
+            lastModified: ktmNow,  // Nepal Local
             serverTimestamp: Date.now()
         };
 
-        // If createdAt doesn't exist in DB, this is a new user setup
+        // 🟢 CHANGE: Ensure 'createdAt' also uses the KTM format if missing
         if (!currentData.createdAt) {
-            updates.createdAt = ktmNow;
+            updates.createdAt = ktmNow; 
         }
 
         await update(userInfoRef, updates);
@@ -120,7 +119,7 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
         companyName,
         units: newUnits,
         wacc: Number(newWacc.toFixed(2)),
-        lastUpdated: ktmNow // Updated to KTM Local
+        lastUpdated: ktmNow // Nepal Local
     };
 
     // 2. Add Transaction History
@@ -132,7 +131,7 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
         units: txUnits,
         price: txPrice,
         timestamp: Date.now(),
-        createdAtKTM: ktmNow // Explicit local time for transaction history
+        createdAtKTM: ktmNow // Nepal Local
     };
 
     // 3. Update User Metadata
