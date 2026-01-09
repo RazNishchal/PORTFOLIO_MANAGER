@@ -3,7 +3,8 @@ import { ref, push, update, onValue, get } from "firebase/database";
 
 /**
  * 🕒 PRIVATE HELPER: Get Kathmandu Local Time
- * Returns a readable string: "MM/DD/YYYY, HH:MM:SS AM/PM"
+ * Specifically handles the +5:45 offset for Nepal.
+ * Format: "MM/DD/YYYY, HH:MM:SS AM/PM"
  */
 const getKTMTime = () => {
     return new Date().toLocaleString("en-US", {
@@ -55,7 +56,7 @@ export const getUserInfoFromDB = async (userId) => {
 
 /**
  * 👤 UPDATE USER INFO
- * Fixes: createdAt, lastActive, and lastModified to Kathmandu Time.
+ * Ensures 'createdAt', 'lastActive', and 'lastModified' all use KTM format.
  */
 export const updateUserInfoInDB = async (userId, data) => {
     if (!userId) return;
@@ -63,18 +64,17 @@ export const updateUserInfoInDB = async (userId, data) => {
         const userInfoRef = ref(db, `users/${userId}/userInfo`);
         const ktmNow = getKTMTime();
         
-        // Check current data to see if createdAt already exists
         const snapshot = await get(userInfoRef);
         const currentData = snapshot.val() || {};
 
         const updates = {
             ...data,
-            lastActive: ktmNow,    // Nepal Local
-            lastModified: ktmNow,  // Nepal Local
+            lastActive: ktmNow,    
+            lastModified: ktmNow,  
             serverTimestamp: Date.now()
         };
 
-        // 🟢 CHANGE: Ensure 'createdAt' also uses the KTM format if missing
+        // 🟢 FIX: Force createdAt to use the KTM formatted string if it's a new entry
         if (!currentData.createdAt) {
             updates.createdAt = ktmNow; 
         }
@@ -87,6 +87,7 @@ export const updateUserInfoInDB = async (userId, data) => {
 
 /**
  * 🚀 UPDATE PORTFOLIO
+ * Ensures holdings and history nodes use KTM format.
  */
 export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, marketData = {}) => {
     const symbol = tx.symbol.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
@@ -112,17 +113,17 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
     const updates = {};
     const ktmNow = getKTMTime();
 
-    // 1. Update Holdings
+    // 1. Update Holdings Node
     const holdingPath = `users/${userId}/holdings/${symbol}`;
     updates[holdingPath] = newUnits <= 0 ? null : {
         symbol,
         companyName,
         units: newUnits,
         wacc: Number(newWacc.toFixed(2)),
-        lastUpdated: ktmNow // Nepal Local
+        lastUpdated: ktmNow // KTM format
     };
 
-    // 2. Add Transaction History
+    // 2. Add Transaction History entry
     const newTxKey = push(ref(db, `users/${userId}/transactions`)).key;
     updates[`users/${userId}/transactions/${newTxKey}`] = {
         symbol,
@@ -131,10 +132,10 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
         units: txUnits,
         price: txPrice,
         timestamp: Date.now(),
-        createdAtKTM: ktmNow // Nepal Local
+        dateKTM: ktmNow // KTM format for history records
     };
 
-    // 3. Update User Metadata
+    // 3. Update User Metadata node
     updates[`users/${userId}/userInfo/lastTransactionAt`] = ktmNow;
     updates[`users/${userId}/userInfo/lastActive`] = ktmNow;
 
