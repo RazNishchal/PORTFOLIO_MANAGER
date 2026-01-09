@@ -2,6 +2,16 @@ import { db } from '../firebase';
 import { ref, push, update, onValue, get } from "firebase/database";
 
 /**
+ * 🕒 PRIVATE HELPER: Get Kathmandu Local Time
+ * Returns a string: "MM/DD/YYYY, HH:MM:SS AM/PM"
+ */
+const getKTMTime = () => {
+    return new Date().toLocaleString("en-US", {
+        timeZone: "Asia/Kathmandu",
+    });
+};
+
+/**
  * ⚡ REAL-TIME MARKET LISTENER
  */
 export const listenToMarketData = (callback) => {
@@ -37,19 +47,17 @@ export const getUserInfoFromDB = async (userId) => {
 };
 
 /**
- * 👤 UPDATE USER INFO (Email, Verification, and Metadata)
- * This is the central function for pushing user changes to the DB.
+ * 👤 UPDATE USER INFO
+ * Uses Kathmandu time for tracking profile updates.
  */
 export const updateUserInfoInDB = async (userId, data) => {
     if (!userId) return;
     try {
         const userInfoRef = ref(db, `users/${userId}/userInfo`);
 
-        // We use update to merge new data into the existing userInfo node
         await update(userInfoRef, {
             ...data,
-            lastModified: new Date().toISOString(),
-            // Ensure server-side tracking if not provided
+            lastModified: getKTMTime(), // Updated to KTM Local
             serverTimestamp: Date.now()
         });
     } catch (error) {
@@ -59,6 +67,7 @@ export const updateUserInfoInDB = async (userId, data) => {
 
 /**
  * 🚀 UPDATE PORTFOLIO
+ * Updates holdings and transactions using Kathmandu time.
  */
 export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, marketData = {}) => {
     const symbol = tx.symbol.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
@@ -82,6 +91,7 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
     }
 
     const updates = {};
+    const ktmNow = getKTMTime(); // Captured once for atomicity
 
     // 1. Update Holdings
     const holdingPath = `users/${userId}/holdings/${symbol}`;
@@ -90,7 +100,7 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
         companyName,
         units: newUnits,
         wacc: Number(newWacc.toFixed(2)),
-        lastUpdated: new Date().toISOString()
+        lastUpdated: ktmNow // Updated to KTM Local
     };
 
     // 2. Add Transaction History
@@ -101,11 +111,12 @@ export const updatePortfolioInDB = async (userId, tx, currentHoldings = {}, mark
         type: tx.type,
         units: txUnits,
         price: txPrice,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        createdAtKTM: ktmNow // Added for readable Nepal history
     };
 
-    // 3. Update User Metadata (Sync on every transaction)
-    updates[`users/${userId}/userInfo/lastTransactionAt`] = new Date().toISOString();
+    // 3. Update User Metadata
+    updates[`users/${userId}/userInfo/lastTransactionAt`] = ktmNow; // Updated to KTM Local
 
     await update(ref(db), updates);
     return pruneTransactions(userId);
